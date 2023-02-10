@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Union
 from openpyxl.cell import Cell
 import openpyxl.styles as openpyxl
-from styling.style import StylePart
+from styling.style_part import StylePart
 
 
 class BorderStyle(Enum):

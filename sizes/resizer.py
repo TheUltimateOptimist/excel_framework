@@ -1,19 +1,19 @@
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import Union
 from openpyxl.utils import get_column_letter
-import sizes.sizes as sizes
+from sizes.dimension import ColumnDimension, RowDimension, Dimension
 
 
 class Resizer:
-    def __init__(self, sheet: Worksheet, dimensions: list[sizes.Dimension]) -> None:
+    def __init__(self, sheet: Worksheet, dimensions: list[Dimension]) -> None:
         self.sheet = sheet
-        self.row_dimensions = dict[Union[int, None], sizes.RowDimension]()
+        self.row_dimensions = dict[Union[int, None], RowDimension]()
         self.column_dimensions = dict[Union[int,
-                                            None], sizes.ColumnDimension]()
+                                            None], ColumnDimension]()
         for dimension in dimensions:
-            if isinstance(dimension, sizes.RowDimension):
+            if isinstance(dimension, RowDimension):
                 self.row_dimensions[dimension.index] = dimension
-            elif isinstance(dimension, sizes.ColumnDimension):
+            elif isinstance(dimension, ColumnDimension):
                 self.column_dimensions[dimension.index] = dimension
 
     def collect_length(self, row_index: int, column_index: int, length: int) -> None:

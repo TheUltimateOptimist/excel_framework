@@ -1,13 +1,12 @@
-# from queue import LifoQueue
-
-import excel.excel as excel
+from excel.excel_file import ExcelFile
+from excel.excel_sheet import ExcelSheet
 from sizes.dimension import ColumnDimension, RowDimension
 from buildables.non_layout.excel_cell import ExcelCell
 from buildables.layout.column import Column
 from buildables.layout.row import Row
 
-excel.ExcelFile("test_exce.xlsx", sheets=[
-    excel.ExcelSheet(
+ExcelFile("test_exce.xlsx", sheets=[
+    ExcelSheet(
         "Sheet One",
         child=Column(
             children=[
@@ -17,7 +16,7 @@ excel.ExcelFile("test_exce.xlsx", sheets=[
             ]
         )
     ),
-    excel.ExcelSheet(
+    ExcelSheet(
         "Sheet Two",
         child=Row(
             children=[
@@ -28,7 +27,7 @@ excel.ExcelFile("test_exce.xlsx", sheets=[
         )
     )
 ],
-)
+).create()
 
 # from openpyxl.workbook import Workbook
 # from openpyxl.worksheet.worksheet import Worksheet

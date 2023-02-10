@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from typing import Any
-import internals.internals as internal
-import sizes.sizes as sizes
+from internals.buildable import Buildable
+from internals.build_context import BuildContext
+from sizes.size import Size
 from overrides import override
 
 
 @dataclass
-class ExcelCell(internal.Buildable):
+class ExcelCell(Buildable):
     value: Any = None
 
     def __get_length(self):
@@ -17,11 +18,11 @@ class ExcelCell(internal.Buildable):
         return len(str(self.value))
 
     @override
-    def get_size(self) -> sizes.Size:
-        return sizes.Size(1, 1)
+    def get_size(self) -> Size:
+        return Size(1, 1)
 
     @override
-    def internal_build(self, context: internal.BuildContext) -> None:
+    def internal_build(self, context: BuildContext) -> None:
         context.collect_length(self.__get_length())
         cell = context.sheet.cell(
             context.row_index, context.column_index, self.value)

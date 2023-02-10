@@ -1,15 +1,16 @@
-import internals.internals as internal
-import sizes.sizes as sizes
+from internals.buildable import Buildable
+from internals.build_context import BuildContext
+from sizes.size import Size
 from overrides import override
 
 
-class Column(internal.Buildable):
-    def __init__(self, children: list[internal.Buildable] = []) -> None:
+class Column(Buildable):
+    def __init__(self, children: list[Buildable] = []) -> None:
         super().__init__()
         self.children = children
 
     @override
-    def get_size(self) -> sizes.Size:
+    def get_size(self) -> Size:
         width = 0
         height = 0
         for child in self.children:
@@ -17,10 +18,10 @@ class Column(internal.Buildable):
             height += child_size.height
             if child_size.width > width:
                 width = child_size.width
-        return sizes.Size(width, height)
+        return Size(width, height)
 
     @override
-    def internal_build(self, context: internal.BuildContext) -> None:
+    def internal_build(self, context: BuildContext) -> None:
         row_index = context.row_index
         column_index = context.column_index
         for child in self.children:

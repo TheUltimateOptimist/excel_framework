@@ -3,42 +3,42 @@ from typing import Union
 from dataclasses import dataclass
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-import excel.excel as excel
-import sizes.sizes as sizes
-import styling.styling as styling
+from sizes.resizer import Resizer
+from sizes.dimension import Dimension
+from sizes.size import Size
+from styling.border import ParentBorderCoordinates
+from styling.style import Style
 
 
 @dataclass
 class BuildContext(ABC):
     workbook: Workbook
     sheet: Worksheet
-    resizer: sizes.Resizer
+    resizer: Resizer
     row_index: int = 1
     column_index: int = 1
-    style: Union[styling.Style, None] = None
-    parent_border_coordinates: Union[styling.ParentBorderCoordinates, None] = None
+    style: Union[Style, None] = None
+    parent_border_coordinates: Union[ParentBorderCoordinates, None] = None
 
     @staticmethod
-    def initial(sheet: excel.ExcelSheet) -> 'BuildContext':
+    def initial(title: str, dimensions: list[Dimension]) -> 'BuildContext':
         workbook = Workbook()
-        workbook.active.title = sheet.title
-        return BuildContext(workbook, workbook.active, sizes.Resizer(workbook.active, sheet.dimensions))
+        workbook.active.title = title
+        return BuildContext(workbook, workbook.active, Resizer(workbook.active, dimensions))
 
-    def new_sheet(self, sheet: excel.ExcelSheet) -> 'BuildContext':
-        new_sheet: Worksheet = self.workbook.create_sheet(sheet.title)
-        return BuildContext(self.workbook, new_sheet, sizes.Resizer(new_sheet, sheet.dimensions))
+    def new_sheet(self, title: str, dimensions: list[Dimension]) -> 'BuildContext':
+        new_sheet: Worksheet = self.workbook.create_sheet(title)
+        return BuildContext(self.workbook, new_sheet, Resizer(new_sheet, dimensions))
 
     def collect_length(self, length: int):
         self.resizer.collect_length(self.row_index, self.column_index, length)
 
-    def with_style_change(self, styler: styling.Styler) -> 'BuildContext':
-        new_style = styler.style
+    def with_style_change(self, new_style: Style, child_size: Size) -> 'BuildContext':
         if self.style:
             new_style = self.style.join(new_style)
         new_parent_border_coordinates = self.parent_border_coordinates
         if new_style.parent_border:
-            child_size = styler.child.get_size()
-            new_parent_border_coordinates = styling.ParentBorderCoordinates(
+            new_parent_border_coordinates = ParentBorderCoordinates(
                 self.row_index,
                 self.column_index,
                 self.row_index + child_size.width - 1,

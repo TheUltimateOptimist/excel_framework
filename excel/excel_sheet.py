@@ -1,11 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union
-import sizes.sizes as sizes
-import internals.internals as internal
+from sizes.dimension import Dimension
+from internals.buildable import Buildable
 
 
-@dataclass
+@dataclass(frozen=True)
 class ExcelSheet:
     title: str
-    child: Union[internal.Buildable, None] = None
-    dimensions: list[sizes.Dimension] = []
+    child: Union[Buildable, None] = None
+    dimensions: list[Dimension] = field(default_factory=list)
