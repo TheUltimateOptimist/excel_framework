@@ -1,17 +1,11 @@
-from internals.build_context import BuildContext
-from sizes.dimension import Dimension
-from sizes.resizer import Resizer
-from ui_pieces.ui_piece import UIPiece
+from dataclasses import dataclass
+from typing import Union
+import sizes.sizes as sizes
+import internals.internals as internal
 
+
+@dataclass
 class ExcelSheet:
-    def __init__(self, title: str, dimensions: list[Dimension] = [], child: UIPiece = None) -> None:
-        self.title = title
-        self.dimensions = dimensions
-        self.child = child
-
-    def build(self, context: BuildContext):
-        context.sheet.title = self.title
-        context.resizer = Resizer(context.sheet, self.dimensions)
-        if self.child is not None:
-            self.child.build(context)
-        context.resizer.resize()
+    title: str
+    child: Union[internal.Buildable, None] = None
+    dimensions: list[sizes.Dimension] = []

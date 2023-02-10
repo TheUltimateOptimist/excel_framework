@@ -1,19 +1,27 @@
-from internals.build_context import BuildContext
+from typing import Union
+from dataclasses import dataclass
 from excel.excel_sheet import ExcelSheet
-from internals.buildable import Buildable
+import styling.styling as styling
+import internals.internals as internal
 
-class ExcelFile(Buildable):
-    def __init__(self, filename: str, sheets: list[ExcelSheet] = []) -> None:
-        self.filename = filename
-        self.sheets = sheets
 
-    def build(self, context = None):
-        if context is None:
-            context = BuildContext()
-        for i,sheet in enumerate(self.sheets):
-            if i == 0:
-                sheet.build(context)
-            else:
-                context.new_sheet()
-                sheet.build(context)
+@dataclass(frozen=True)
+class ExcelFile:
+    filename: str
+    sheets: list[ExcelSheet] = []
+    global_style: Union[styling.Style, None] = None
+
+    def create(self):
+        if len(self.sheets) == 0:
+            return
+        context = internal.BuildContext.initial(self.sheets[0])
+        for i, sheet in enumerate(self.sheets):
+            if i > 0:
+                context = context.new_sheet(sheet)
+            if sheet.child and self.global_style:
+                styling.Styler.from_style(
+                    sheet.child, self.global_style).internal_build(context)
+            elif sheet.child:
+                sheet.child.internal_build(context)
+            context.resizer.resize()
         context.workbook.save(self.filename)

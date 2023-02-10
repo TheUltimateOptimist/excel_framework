@@ -1,46 +1,56 @@
 from openpyxl.worksheet.worksheet import Worksheet
+from typing import Union
 from openpyxl.utils import get_column_letter
-from sizes.column_dimension import ColumnDimension
-from sizes.column_size_data import ColumnSizeData
-from sizes.dimension import Dimension
-from sizes.row_dimension import RowDimension
+import sizes.sizes as sizes
+
 
 class Resizer:
-    def __init__(self, sheet: Worksheet, dimensions: list[Dimension]) -> None:
+    def __init__(self, sheet: Worksheet, dimensions: list[sizes.Dimension]) -> None:
         self.sheet = sheet
-        self.row_dimensions = list[RowDimension]()
-        self.column_sizes = dict[int, ColumnSizeData]()
+        self.row_dimensions = dict[Union[int, None], sizes.RowDimension]()
+        self.column_dimensions = dict[Union[int,
+                                            None], sizes.ColumnDimension]()
         for dimension in dimensions:
-            if isinstance(dimension, RowDimension):
-                self.row_dimensions.append(dimension)
-            elif isinstance(dimension, ColumnDimension):
-                self.column_sizes[dimension.index] = ColumnSizeData(dimension)
-            
-    def collect(self, column_index: int, length: int):
-        if column_index in self.column_sizes.keys():
-            self.column_sizes[column_index].add_length(length)
-        else:
-            self.column_sizes[column_index] = ColumnSizeData.from_index_and_length(column_index, length)
+            if isinstance(dimension, sizes.RowDimension):
+                self.row_dimensions[dimension.index] = dimension
+            elif isinstance(dimension, sizes.ColumnDimension):
+                self.column_dimensions[dimension.index] = dimension
+
+    def collect_length(self, row_index: int, column_index: int, length: int) -> None:
+        if row_index not in self.row_dimensions and None in self.row_dimensions:
+            self.row_dimensions[row_index] = self.row_dimensions[None]
+        if column_index in self.column_dimensions:
+            dimension = self.column_dimensions[column_index]
+            self.column_dimensions[column_index] = dimension.with_length(
+                length)
+        elif None in self.column_dimensions:
+            dimension = self.column_dimensions[None]
+            self.column_dimensions[column_index] = dimension.with_length(
+                length)
 
     def resize(self):
-        self.__resize_columns()
         self.__resize_rows()
+        self.__resize_columns()
+
+    def __resize_rows(self):
+        if None in self.row_dimensions:
+            del self.row_dimensions[None]
+        for row_index in self.row_dimensions:
+            self.sheet.row_dimensions[row_index].height = self.row_dimensions[row_index].height
 
     def __resize_columns(self):
-        for (index, column_size_data) in self.column_sizes.items():
-            assert isinstance(column_size_data, ColumnSizeData)
-            column_dimension = column_size_data.column_dimension
-            column_letter = get_column_letter(index)
-            if not column_dimension.auto_size and column_dimension.width is not None:
-                self.sheet.column_dimensions[column_letter].width = column_dimension.width
-            else:
-                width = column_size_data.get_max_length()
-                if width < column_dimension.min_width:
+        if None in self.column_dimensions:
+            del self.column_dimensions[None]
+        for col_index in self.column_dimensions:
+            assert(type(col_index) is int)
+            column_dimension = self.column_dimensions[col_index]
+            column_letter = get_column_letter(col_index)
+            if column_dimension.auto_size:
+                width = column_dimension.max_content_length*column_dimension.length_multiplier
+                if column_dimension.min_width is not None and width < column_dimension.min_width:
                     width = column_dimension.min_width
                 if column_dimension.max_width is not None and width > column_dimension.max_width:
                     width = column_dimension.max_width
                 self.sheet.column_dimensions[column_letter].width = width
-
-    def __resize_rows(self):
-        for row_dimension in self.row_dimensions:
-            self.sheet.row_dimensions[row_dimension.index].height = row_dimension.height
+            else:
+                self.sheet.column_dimensions[column_letter].width = column_dimension.width

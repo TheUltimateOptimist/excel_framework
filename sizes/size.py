@@ -1,4 +1,7 @@
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
 class Size:
-    def __init__(self, width: int, height: int) -> None:
-        self.width = width
-        self.height = height
+    width: int
+    height: int
