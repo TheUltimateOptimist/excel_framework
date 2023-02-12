@@ -96,32 +96,37 @@ class Border(StylePart):
         cell.border = border
 
     def apply_as_parent_to(self, cell: Cell, parent_border_coordinates: ParentBorderCoordinates) -> None:
-        border: openpyxl.Border = cell.border
+        top: Union[openpyxl.Side, None] = cell.border.top
+        bottom: Union[openpyxl.Side, None] = cell.border.bottom
+        right: Union[openpyxl.Side, None] = cell.border.right
+        left: Union[openpyxl.Side, None] = cell.border.left
         if cell.row == parent_border_coordinates.row_left_top:
             if self.all is not None:
-                border.top = self.all.to_openpyxl()
+                top = self.all.to_openpyxl()
             if self.horizontal is not None:
-                border.top = self.horizontal.to_openpyxl()
+                top = self.horizontal.to_openpyxl()
             if self.top is not None:
-                border.top = self.top.to_openpyxl()
+                top = self.top.to_openpyxl()
         if cell.column == parent_border_coordinates.col_right_bottom:
             if self.all is not None:
-                border.right = self.all.to_openpyxl()
+                right = self.all.to_openpyxl()
             if self.vertical is not None:
-                border.right = self.vertical.to_openpyxl()
+                right = self.vertical.to_openpyxl()
             if self.right is not None:
-                border.right = self.right.to_openpyxl()
+                right = self.right.to_openpyxl()
         if cell.row == parent_border_coordinates.row_right_bottom:
             if self.all is not None:
-                border.bottom = self.all.to_openpyxl()
+                bottom = self.all.to_openpyxl()
             if self.horizontal is not None:
-                border.bottom = self.horizontal.to_openpyxl()
+                bottom = self.horizontal.to_openpyxl()
             if self.bottom is not None:
-                border.bottom = self.bottom.to_openpyxl()
+                bottom = self.bottom.to_openpyxl()
         if cell.column == parent_border_coordinates.col_left_top:
             if self.all is not None:
-                border.left = self.all.to_openpyxl()
+                left = self.all.to_openpyxl()
             if self.vertical is not None:
-                border.left = self.vertical.to_openpyxl()
+                left = self.vertical.to_openpyxl()
             if self.right is not None:
-                border.left = self.right.to_openpyxl()
+                left = self.right.to_openpyxl()
+        cell.border = openpyxl.Border(
+            left=left, right=right, top=top, bottom=bottom)

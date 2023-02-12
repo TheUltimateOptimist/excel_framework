@@ -1,9 +1,41 @@
+from dataclasses import dataclass
 from excel.excel_file import ExcelFile
 from excel.excel_sheet import ExcelSheet
-from sizes.dimension import ColumnDimension, RowDimension
 from buildables.non_layout.excel_cell import ExcelCell
 from buildables.layout.column import Column
 from buildables.layout.row import Row
+from buildables.layout.table import Table, TableColumn, AutoWidth, FixedWidth
+from styling.border import Border, BorderSide, BorderStyle
+from styling.style import Style
+from styling.color import Colors
+from styling.fill import Fill
+from styling.text_style import TextStyle
+
+
+@dataclass(frozen=True)
+class TestModel:
+    one: str
+    two: str
+    three: str
+
+
+test_model = TestModel("jdfdf", "das ist sehr schön", "ja du")
+table = Table[TestModel](
+    [
+        TableColumn[TestModel](
+            "one", lambda model: model.one, width=FixedWidth(6)),
+        TableColumn[TestModel](
+            "two", lambda model: model.two, width=AutoWidth()),
+        TableColumn[TestModel](
+            "three", lambda model: model.three, )
+    ],
+    [
+        test_model,
+        test_model
+    ],
+    column_name_style=Style(fill=Fill(Colors.blue.dark),
+                            text_style=TextStyle(font_color=Colors.white), parent_border=Border(all=BorderSide(Colors.black, border_style=BorderStyle.THICK.value)))
+)
 
 ExcelFile("test_exce.xlsx", sheets=[
     ExcelSheet(
@@ -12,7 +44,8 @@ ExcelFile("test_exce.xlsx", sheets=[
             children=[
                 ExcelCell("1"),
                 ExcelCell("2"),
-                ExcelCell("3")
+                ExcelCell("3"),
+                table
             ]
         )
     ),
@@ -22,10 +55,12 @@ ExcelFile("test_exce.xlsx", sheets=[
             children=[
                 ExcelCell("1"),
                 ExcelCell("2"),
-                ExcelCell("3")
+                ExcelCell("3"),
+                table
             ]
         )
-    )
+    ),
+    ExcelSheet("Sheet tABLE", child=table)
 ],
 ).create()
 
@@ -109,3 +144,4 @@ ExcelFile("test_exce.xlsx", sheets=[
 
 # one = One(3, 3)
 # print(one.sum)
+# import buildables.layout.table

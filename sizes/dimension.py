@@ -1,11 +1,73 @@
 from dataclasses import dataclass
-from abc import ABC
+from overrides import override
+from abc import ABC, abstractmethod
 from typing import Union
+
+
+@dataclass(frozen=True)
+class FixedWidth:
+    width: float
+
+
+@dataclass(frozen=True)
+class AutoWidth:
+    min_width: float = 13
+    max_width: Union[float, None] = None
+    length_multiplier: float = 1
+
+
+class InternalDimension(ABC):
+    @abstractmethod
+    def with_length(self, length: int) -> 'InternalDimension':
+        pass
+
+    @abstractmethod
+    def final_value(self) -> float:
+        pass
+
+
+@dataclass(frozen=True)
+class FixedInternalDimension(InternalDimension):
+    value: float
+
+    @override
+    def with_length(self, length: int) -> 'FixedInternalDimension':
+        return self
+
+    @override
+    def final_value(self) -> float:
+        return self.value
+
+
+@dataclass(frozen=True)
+class VariableInternalDimension(InternalDimension):
+    auto_width: AutoWidth
+    required_length: int = 0
+
+    @override
+    def with_length(self, length: int) -> 'VariableInternalDimension':
+        return VariableInternalDimension(
+            self.auto_width,
+            length if length > self.required_length else self.required_length
+        )
+
+    @override
+    def final_value(self) -> float:
+        proposed_value = self.required_length*self.auto_width.length_multiplier
+        if self.auto_width.min_width > proposed_value:
+            return self.auto_width.min_width
+        if self.auto_width.max_width is not None and self.auto_width.max_width < proposed_value:
+            return self.auto_width.max_width
+        return proposed_value
 
 
 @dataclass(frozen=True)
 class Dimension(ABC):
     index: Union[int, None]
+
+    @abstractmethod
+    def to_internal(self):
+        pass
 
 
 @dataclass(frozen=True)
@@ -15,41 +77,19 @@ class RowDimension(Dimension):
     """
     height: float = 15
 
+    @override
+    def to_internal(self) -> FixedInternalDimension:
+        return FixedInternalDimension(self.height)
+
 
 @dataclass(frozen=True)
 class ColumnDimension(Dimension):
-    """
-    Do not use the default constructor!\n
-    Use ColumnDimension.fixed() or ColumnDimension.auto() instead
-    """
-    width: Union[float, None]
-    min_width: Union[float, None]
-    max_width: Union[float, None]
-    auto_size: bool
-    max_content_length: int = 0
-    length_multiplier: float = 1
+    width: Union[FixedWidth, AutoWidth]
 
-    @staticmethod
-    def fixed(index: Union[int, None], width: float) -> 'ColumnDimension':
-        """
-        If the given index is None, the dimension will be applied onto all columns
-        """
-        return ColumnDimension(index, width, min_width=None, max_width=None, auto_size=False)
-
-    @staticmethod
-    def auto(index: Union[int, None], min_width: float = 13, max_width: Union[float, None] = None, length_multiplier: float = 1) -> 'ColumnDimension':
-        """
-        If the given index is None, the dimension will be applied onto all columns
-        """
-        return ColumnDimension(index, None, min_width, max_width, auto_size=True, length_multiplier=length_multiplier)
-
-    def with_length(self, length: int) -> 'ColumnDimension':
-        return ColumnDimension(
-            self.index,
-            self.width,
-            self.min_width,
-            self.max_width,
-            self.auto_size,
-            length if length > self.max_content_length else self.max_content_length,
-            self.length_multiplier
-        )
+    @override
+    def to_internal(self):
+        if type(self.width) is FixedWidth:
+            return FixedInternalDimension(self.width.width)
+        else:
+            assert type(self.width) is AutoWidth
+            return VariableInternalDimension(self.width)

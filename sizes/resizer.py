@@ -1,20 +1,21 @@
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import Union
 from openpyxl.utils import get_column_letter
-from sizes.dimension import ColumnDimension, RowDimension, Dimension
+from sizes.dimension import ColumnDimension, RowDimension, Dimension, FixedInternalDimension, InternalDimension
 
 
 class Resizer:
     def __init__(self, sheet: Worksheet, dimensions: list[Dimension]) -> None:
         self.sheet = sheet
-        self.row_dimensions = dict[Union[int, None], RowDimension]()
+        self.row_dimensions = dict[Union[int, None], FixedInternalDimension]()
         self.column_dimensions = dict[Union[int,
-                                            None], ColumnDimension]()
+                                            None], InternalDimension]()
         for dimension in dimensions:
             if isinstance(dimension, RowDimension):
-                self.row_dimensions[dimension.index] = dimension
+                self.row_dimensions[dimension.index] = dimension.to_internal()
             elif isinstance(dimension, ColumnDimension):
-                self.column_dimensions[dimension.index] = dimension
+                self.column_dimensions[dimension.index] = dimension.to_internal(
+                )
 
     def collect_length(self, row_index: int, column_index: int, length: int) -> None:
         if row_index not in self.row_dimensions and None in self.row_dimensions:
@@ -28,6 +29,9 @@ class Resizer:
             self.column_dimensions[column_index] = dimension.with_length(
                 length)
 
+    def collect_column_dimension(self, dimension: ColumnDimension):
+        self.column_dimensions[dimension.index] = dimension.to_internal()
+
     def resize(self):
         self.__resize_rows()
         self.__resize_columns()
@@ -36,7 +40,7 @@ class Resizer:
         if None in self.row_dimensions:
             del self.row_dimensions[None]
         for row_index in self.row_dimensions:
-            self.sheet.row_dimensions[row_index].height = self.row_dimensions[row_index].height
+            self.sheet.row_dimensions[row_index].height = self.row_dimensions[row_index].final_value()
 
     def __resize_columns(self):
         if None in self.column_dimensions:
@@ -45,12 +49,4 @@ class Resizer:
             assert(type(col_index) is int)
             column_dimension = self.column_dimensions[col_index]
             column_letter = get_column_letter(col_index)
-            if column_dimension.auto_size:
-                width = column_dimension.max_content_length*column_dimension.length_multiplier
-                if column_dimension.min_width is not None and width < column_dimension.min_width:
-                    width = column_dimension.min_width
-                if column_dimension.max_width is not None and width > column_dimension.max_width:
-                    width = column_dimension.max_width
-                self.sheet.column_dimensions[column_letter].width = width
-            else:
-                self.sheet.column_dimensions[column_letter].width = column_dimension.width
+            self.sheet.column_dimensions[column_letter].width = column_dimension.final_value()

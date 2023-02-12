@@ -19,7 +19,8 @@ class Styler(Buildable):
 
     @override
     def internal_build(self, context: BuildContext) -> None:
-        new_context = context.with_style_change(self)
+        new_context = context.with_style_change(
+            self.style, self.child.get_size())
         self.child.internal_build(new_context)
 
     @override

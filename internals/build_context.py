@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from sizes.resizer import Resizer
-from sizes.dimension import Dimension
+from sizes.dimension import Dimension, ColumnDimension
 from sizes.size import Size
 from styling.border import ParentBorderCoordinates
 from styling.style import Style
@@ -33,6 +33,9 @@ class BuildContext(ABC):
     def collect_length(self, length: int):
         self.resizer.collect_length(self.row_index, self.column_index, length)
 
+    def collect_column_dimension(self, dimension: ColumnDimension):
+        self.resizer.collect_column_dimension(dimension)
+
     def with_style_change(self, new_style: Style, child_size: Size) -> 'BuildContext':
         if self.style:
             new_style = self.style.join(new_style)
@@ -41,8 +44,8 @@ class BuildContext(ABC):
             new_parent_border_coordinates = ParentBorderCoordinates(
                 self.row_index,
                 self.column_index,
-                self.row_index + child_size.width - 1,
-                self.column_index + child_size.height - 1
+                self.row_index + child_size.height - 1,
+                self.column_index + child_size.width - 1
             )
         return BuildContext(
             self.workbook,
