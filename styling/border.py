@@ -81,11 +81,11 @@ class Border(StylePart):
     def apply_to(self, cell: Cell) -> None:
         border = openpyxl.Border()
         if self.all is not None:
-            border.left, border.right, border.top, border.bottom = self.all.to_openpyxl()
+            border.left = border.right = border.top = border.bottom = self.all.to_openpyxl()
         if self.horizontal is not None:
-            border.top, border.bottom = self.horizontal.to_openpyxl()
+            border.top = border.bottom = self.horizontal.to_openpyxl()
         if self.vertical is not None:
-            border.left, border.right = self.vertical.to_openpyxl()
+            border.left = border.right = self.vertical.to_openpyxl()
         if self.left is not None:
             border.left = self.left.to_openpyxl()
         if self.right is not None:
