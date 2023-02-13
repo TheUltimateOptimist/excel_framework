@@ -27,11 +27,12 @@ class BorderStyle(Enum):
 @dataclass(frozen=True)
 class BorderSide:
     color: Union[Color, None] = None
-    border_style: Union[str, None] = None
+    border_style: Union[BorderStyle, None] = None
 
     def to_openpyxl(self):
+
         return openpyxl.Side(
-            border_style=self.border_style,
+            border_style=self.border_style.value if self.border_style else None,
             color=self.color if self.color is None else self.color.to_openpyxl()
         )
 
