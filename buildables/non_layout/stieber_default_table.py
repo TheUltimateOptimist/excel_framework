@@ -1,32 +1,32 @@
-# from styling.cell_style import CellStyle
-# from ui_pieces.non_layout.excel_cell import ExcelCell
-# from ui_pieces.non_layout.table import Table
-# from openpyxl.styles import Side, Color, Border, PatternFill, Font
+from dataclasses import dataclass
+from overrides import override
+from typing import TypeVar, Generic, ClassVar
+from buildables.layout.table import Table, TableColumn
+from styling.color import Colors, Color
+from styling.style import Style, TextStyle, Fill
+from styling.border import BorderSide, Border, BorderStyle
+from internals.buildable import Buildable
 
-# class StieberDefaultTable(Table):
-#     def __init__(self, data: list[tuple], column_names: tuple[str]) -> None:
-#         super().__init__(data, column_names)
+T = TypeVar("T")
 
-#     def get_column_name_cells(self, column_names: tuple[str]) -> tuple[ExcelCell]:
-#         final_cells = []
-#         for column_name in column_names:
-#             final_cells.append(ExcelCell(column_name, style=CellStyle(border=self.__get_border(), fill=self.__get_blue_fill(), font=self.__get_white_font())))
-#         return tuple(final_cells)
+@dataclass(frozen=True)
+class StieberDefaultTable(Buildable, Generic[T]):
+    columns: list[TableColumn[T]]
+    data: list[T]
 
-#     def get_cells(self, data: tuple) -> tuple[ExcelCell]:
-#         final_cells = []
-#         for value in data:
-#             final_cells.append(ExcelCell(value, style=CellStyle(border=self.__get_border())))
-#         return tuple(final_cells)
+    column_name_text_style: ClassVar[TextStyle] = TextStyle(font_color=Colors.white)
+    column_name_fill: ClassVar[Fill] = Fill(Color("FF000060"))
+    border: ClassVar[Border] = Border(all=BorderSide(Colors.black, BorderStyle.THIN))
 
-#     def __get_border(self) -> Border:
-#         side = Side(style="thin", color=Color(rgb="FF000000"))
-#         return Border(right=side, left=side, top=side, bottom=side)
-
-#     def __get_blue_fill(self):
-#         blue = "FF000060"
-#         return PatternFill(start_color=blue, end_color=blue, fill_type="solid")
-
-#     def __get_white_font(self) -> Font:
-#         white = "FFFFFFFF"
-#         return Font(color=white)
+    @override
+    def build(self) -> 'Buildable':
+        return Table(
+            columns=self.columns,
+            data=self.data,
+            column_name_style=Style(
+                self.column_name_fill,
+                self.column_name_text_style,
+                child_border=self.border
+            ),
+            data_style=Style(child_border=self.border)
+        )

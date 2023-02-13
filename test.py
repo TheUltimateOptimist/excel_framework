@@ -10,7 +10,7 @@ from styling.style import Style
 from styling.color import Colors
 from styling.fill import Fill
 from styling.text_style import TextStyle
-
+from buildables.non_layout.stieber_default_table import StieberDefaultTable
 
 @dataclass(frozen=True)
 class TestModel:
@@ -20,21 +20,27 @@ class TestModel:
 
 
 test_model = TestModel("jdfdf", "das ist sehr schön", "ja du")
-table = Table[TestModel](
-    [
+table = StieberDefaultTable[TestModel](
+    columns=[
         TableColumn[TestModel](
-            "one", lambda model: model.one, width=FixedWidth(6)),
+            "one",
+            lambda model: model.one,
+            width=FixedWidth(6)
+        ),
         TableColumn[TestModel](
-            "two", lambda model: model.two, width=AutoWidth()),
+            "two",
+            lambda model: model.two,
+            width=AutoWidth()
+        ),
         TableColumn[TestModel](
-            "three", lambda model: model.three, )
+            "three",
+            lambda model: model.three
+        )
     ],
-    [
+    data=[
         test_model,
         test_model
     ],
-    column_name_style=Style(fill=Fill(Colors.blue.dark),
-                            text_style=TextStyle(font_color=Colors.white), parent_border=Border(all=BorderSide(Colors.black, border_style=BorderStyle.THICK.value)))
 )
 
 ExcelFile("test_exce.xlsx", sheets=[
