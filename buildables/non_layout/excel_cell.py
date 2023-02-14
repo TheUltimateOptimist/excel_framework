@@ -6,7 +6,7 @@ from sizes.size import Size
 from overrides import override
 
 
-@dataclass
+@dataclass(frozen=True)
 class ExcelCell(Buildable):
     value: Any = None
 

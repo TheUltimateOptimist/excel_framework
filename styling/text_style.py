@@ -25,7 +25,7 @@ class Underline(Enum):
     double = "double"
 
 
-@dataclass
+@dataclass(frozen=True)
 class TextStyle(StylePart):
     font_size: Union[float, None] = None
     font_color: Union[Color, None] = None

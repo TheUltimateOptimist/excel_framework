@@ -7,7 +7,7 @@ from styling.color import *
 from styling.style import StylePart
 
 
-@dataclass
+@dataclass(frozen=True)
 class Fill(StylePart):
     color: Union[Color, None] = None
 

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import openpyxl.styles as openpyxl
 
 
-@dataclass
+@dataclass(frozen=True)
 class Color:
     hex: str
 
@@ -28,7 +28,7 @@ class Color:
         return openpyxl.Color(rgb=self.hex)
 
 
-@dataclass
+@dataclass(frozen=True)
 class ColorGroup(Color):
     darkest: Color
     darker: Color

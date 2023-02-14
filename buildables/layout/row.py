@@ -1,13 +1,12 @@
+from dataclasses import dataclass, field
 from internals.buildable import Buildable
 from internals.build_context import BuildContext
 from sizes.size import Size
 from overrides import override
 
-
+dataclass(frozen=True)
 class Row(Buildable):
-    def __init__(self, children: list[Buildable] = []) -> None:
-        super().__init__()
-        self.children = children
+    children: list[Buildable] = field(default_factory=list)
 
     @override
     def get_size(self) -> Size:
