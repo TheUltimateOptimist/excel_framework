@@ -1,0 +1,26 @@
+# pyproject.toml
+
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "excel-framework"
+version = "1.0.0"
+description = "Generate beautiful excel files with ease."
+readme = "README.md"
+authors = [{ name = "Jonathan Dück", email = "jonathan.dueck@digital-confidence.de" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["excel", "write", "create"]
+dependencies = [
+    "openpyxl",
+]
+requires-python = ">=3.9"
+
+[tool.setuptools]
+py-modules = ['excel', 'sizes', 'styling', 'internals', 'buildables']
