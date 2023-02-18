@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from overrides import override
 from typing import TypeVar, Generic, ClassVar
-from buildables.layout.table import Table, TableColumn
-from styling.color import Colors, Color
-from styling.style import Style, TextStyle, Fill
-from styling.border import BorderSide, Border, BorderStyle
-from internals.buildable import Buildable
+from ...buildables.layout.table import Table, TableColumn
+from ...styling.color import Colors, Color
+from ...styling.style import Style, TextStyle, Fill
+from ...styling.border import BorderSide, Border, BorderStyle
+from ...internals.buildable import Buildable
 
 T = TypeVar("T")
 

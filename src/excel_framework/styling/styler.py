@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import Union
 from overrides import override
-from internals.buildable import Buildable
-from internals.build_context import BuildContext
-from styling.fill import Fill
-from styling.text_style import TextStyle
-from styling.border import Border
-from styling.style import Style
+from ..internals.buildable import Buildable
+from ..internals.build_context import BuildContext
+from .fill import Fill
+from .text_style import TextStyle
+from .border import Border
+from .style import Style
 
 
 @dataclass(frozen=True)

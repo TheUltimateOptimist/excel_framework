@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any
-from internals.buildable import Buildable
-from internals.build_context import BuildContext
-from sizes.size import Size
+from ...internals.buildable import Buildable
+from ...internals.build_context import BuildContext
+from ...sizes.size import Size
 from overrides import override
 
 

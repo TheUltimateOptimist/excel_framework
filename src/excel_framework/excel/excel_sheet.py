@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Union
-from sizes.dimension import Dimension
-from internals.buildable import Buildable
+from ..sizes.dimension import Dimension
+from ..internals.buildable import Buildable
 
 
 @dataclass(frozen=True)

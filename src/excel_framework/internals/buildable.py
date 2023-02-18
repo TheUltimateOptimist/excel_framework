@@ -1,7 +1,7 @@
 from abc import ABC
 from overrides import EnforceOverrides
-from sizes.size import Size
-from internals.build_context import BuildContext
+from ..sizes.size import Size
+from .build_context import BuildContext
 
 
 class Buildable(ABC, EnforceOverrides):

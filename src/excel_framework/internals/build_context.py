@@ -3,11 +3,11 @@ from typing import Union
 from dataclasses import dataclass
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from sizes.resizer import Resizer
-from sizes.dimension import Dimension, ColumnDimension
-from sizes.size import Size
-from styling.border import ParentBorderCoordinates
-from styling.style import Style
+from ..sizes.resizer import Resizer
+from ..sizes.dimension import Dimension, ColumnDimension
+from ..sizes.size import Size
+from ..styling.border import ParentBorderCoordinates
+from ..styling.style import Style
 
 
 @dataclass

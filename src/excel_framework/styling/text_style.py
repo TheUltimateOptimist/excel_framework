@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from typing import Union
 from overrides import override
-from styling.color import *
+from .color import *
 from enum import Enum
 from openpyxl.cell import Cell
 import openpyxl.styles as openpyxl
-from styling.style import StylePart
+from .style import StylePart
 
 
 class VerticalAlignment(Enum):

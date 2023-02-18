@@ -1,9 +1,9 @@
 from typing import Union
 from dataclasses import dataclass, field
-from excel.excel_sheet import ExcelSheet
-from styling.styler import Styler
-from styling.style import Style
-from internals.build_context import BuildContext
+from .excel_sheet import ExcelSheet
+from ..styling.styler import Styler
+from ..styling.style import Style
+from ..internals.build_context import BuildContext
 
 
 @dataclass(frozen=True)

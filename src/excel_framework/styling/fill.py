@@ -3,8 +3,8 @@ from overrides import override
 from typing import Union
 from openpyxl.cell import Cell
 from openpyxl.styles import PatternFill
-from styling.color import *
-from styling.style import StylePart
+from .color import *
+from .style import StylePart
 
 
 @dataclass(frozen=True)

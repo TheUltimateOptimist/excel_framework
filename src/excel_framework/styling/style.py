@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from overrides import override
 from openpyxl.cell import Cell
 
-from styling.style_part import StylePart
-from styling.text_style import TextStyle
-from styling.fill import Fill
-from styling.border import Border
+from .style_part import StylePart
+from .text_style import TextStyle
+from .fill import Fill
+from .border import Border
 
 
 @dataclass(frozen=True)

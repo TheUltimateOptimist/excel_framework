@@ -1,11 +1,11 @@
 from dataclasses import dataclass, replace
 from overrides import override
-from styling.color import *
+from .color import *
 from enum import Enum
 from typing import Union
 from openpyxl.cell import Cell
 import openpyxl.styles as openpyxl
-from styling.style_part import StylePart
+from .style_part import StylePart
 
 
 class BorderStyle(Enum):

@@ -1,7 +1,7 @@
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import Union
 from openpyxl.utils import get_column_letter
-from sizes.dimension import ColumnDimension, RowDimension, Dimension, FixedInternalDimension, InternalDimension
+from .dimension import ColumnDimension, RowDimension, Dimension, FixedInternalDimension, InternalDimension
 
 
 class Resizer:
