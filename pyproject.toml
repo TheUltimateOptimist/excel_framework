@@ -1,26 +1,26 @@
-# pyproject.toml
-
 [build-system]
-requires      = ["setuptools>=61.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "excel_framework"
-version = "1.0.0"
-description = "Generate beautiful excel files with ease."
-readme = "README.md"
-authors = [{ name = "Jonathan Dück", email = "jonathan.dueck@digital-confidence.de" }]
-license = { file = "LICENSE" }
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
+version = "0.0.1"
+authors = [
+  { name="Jonathan Dück", email="jonathan.dueck@digital-confidence.de" },
 ]
-keywords = ["excel", "write", "create"]
+description = "A small example package"
+readme = "README.md"
 dependencies = [
     "openpyxl",
+    "overrides",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 
-[tool.setuptools]
-py-modules = ['excel', 'sizes', 'styling', 'internals', 'buildables']
+[project.urls]
+"Homepage" = "https://github.com/TheUltimateOptimist/excel_framework"
+"Bug Tracker" = "https://github.com/TheUltimateOptimist/excel_framework/issues"
