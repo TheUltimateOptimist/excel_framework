@@ -57,7 +57,7 @@ class Table(Buildable, Generic[T]):
             excel_cells.append(
                 Styler.from_style(
                     ExcelCell(column.name),
-                    column.column_name_style
+                    column.column_name_style if column.column_name_style else Style()
                 )
             )
         return excel_cells
