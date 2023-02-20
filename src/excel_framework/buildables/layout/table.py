@@ -17,8 +17,9 @@ T = TypeVar("T")
 class TableColumn(Generic[T]):
     name: str
     value: Callable[[T], Any]
-    value_style: Union[Callable[[Any], Style], None] = None
     width: Union[AutoWidth, FixedWidth, None] = None
+    column_name_style: Union[Style, None] = None
+    value_style: Union[Callable[[T], Style], None] = None
 
 
 @dataclass(frozen=True)
@@ -42,7 +43,7 @@ class Table(Buildable, Generic[T]):
         return Column([
             Styler.from_style(
                 Row(children=self.__get_column_name_cells()),
-                self.column_name_style if self.column_name_style is not None else Style()
+                self.column_name_style if self.column_name_style else Style()
             ),
             Styler.from_style(
                 Column(children=self.__get_value_rows()),
@@ -53,7 +54,12 @@ class Table(Buildable, Generic[T]):
     def __get_column_name_cells(self) -> list[Buildable]:
         excel_cells = []
         for column in self.columns:
-            excel_cells.append(ExcelCell(column.name))
+            excel_cells.append(
+                Styler.from_style(
+                    ExcelCell(column.name),
+                    column.column_name_style
+                )
+            )
         return excel_cells
 
     def __get_value_rows(self) -> list[Buildable]:
@@ -63,7 +69,7 @@ class Table(Buildable, Generic[T]):
             for column in self.columns:
                 value = column.value(model)
                 style = column.value_style(
-                    value) if column.value_style else Style()
+                    model) if column.value_style else Style()
                 excel_cells.append(Styler.from_style(ExcelCell(value), style))
             rows.append(Row(children=excel_cells))
         return rows
