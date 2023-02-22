@@ -9,15 +9,15 @@ from .style import StylePart
 
 
 class VerticalAlignment(Enum):
-    TOP = 1
-    BOTTOM = 2
-    CENTER = 3
+    TOP = "top"
+    BOTTOM = "bottom"
+    CENTER = "center"
 
 
 class HorizontalAlignment(Enum):
-    LEFT = 1
-    RIGHT = 2
-    CENTER = 3
+    LEFT = "left"
+    RIGHT = "right"
+    CENTER = "center"
 
 
 class Underline(Enum):
@@ -67,8 +67,8 @@ class TextStyle(StylePart):
         cell.number_format = "" if self.number_format is None else self.number_format
         alignment.wrap_text = self.wrap_text
         alignment.shrink_to_fit = self.shrink_to_fit
-        alignment.horizontal = self.horizontal_alignment
-        alignment.vertical = self.vertical_alignment
+        alignment.horizontal = self.horizontal_alignment.value if self.horizontal_alignment else None
+        alignment.vertical = self.vertical_alignment.value if self.vertical_alignment else None
         font.bold = self.bold
         font.italic = self.italic
         font.underline = self.underline if self.underline is None else self.underline.value
