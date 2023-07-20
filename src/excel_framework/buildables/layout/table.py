@@ -28,7 +28,7 @@ class Table(Buildable, Generic[T]):
     data: list[T]
     column_name_style: Union[Style, None] = None
     data_style: Union[Style, None] = None
-    value_styles: Union[list[Union[Style, int]], None] = None
+    value_styles: Union[list[Style], None] = None
 
     @override
     def internal_build(self, context: BuildContext) -> None:
@@ -47,7 +47,7 @@ class Table(Buildable, Generic[T]):
                 if joined_data_style:
                     joined_style = joined_data_style.join(value_style)
                 style_id = context.style_manager.add_named_style(context.workbook, joined_style)
-                self.value_styles[i] = style_id
+                self.value_styles[i] = style_id # type: ignore
         self.build().internal_build(context)
 
     @override
