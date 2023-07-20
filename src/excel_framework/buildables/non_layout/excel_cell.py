@@ -10,7 +10,7 @@ from typing import Union
 @dataclass(frozen=True)
 class ExcelCell(Buildable):
     value: Any = None
-    style_id: Union[int, None] = None
+    conditional_style_index: Union[int, None] = None
 
     def __get_length(self):
         if self.value is None:
@@ -28,18 +28,10 @@ class ExcelCell(Buildable):
         context.collect_length(self.__get_length())
         cell = context.sheet.cell(
             context.row_index, context.column_index, self.value)
-        if not self.style_id and not context.style:
+        if not self.conditional_style_index and not context.style:
             return
-        style_id = self.style_id if self.style_id is not None else context.style_id
-        assert style_id is not None
-        if context.style and context.style.parent_border:
-            assert context.parent_border_coordinates is not None
-            has_top = cell.row == context.parent_border_coordinates.row_left_top
-            has_right = cell.column == context.parent_border_coordinates.col_right_bottom
-            has_bottom = cell.column == context.parent_border_coordinates.row_right_bottom
-            has_left = cell.column == context.parent_border_coordinates.col_left_top
-            context.style.apply_to(cell)
-            assert context.style_id is not None
-            context.style.parent_border.apply_as_parent_to(cell, style_id, has_top, has_right, has_bottom, has_left)
-        elif context.style:
-            cell.style = f"{style_id}"
+        style_name = context.style_name
+        if self.conditional_style_index is not None:
+            assert context.conditional_style_names is not None
+            style_name = context.conditional_style_names[self.conditional_style_index]
+        cell.style = style_name

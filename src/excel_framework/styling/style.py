@@ -15,7 +15,6 @@ from .border import Border
 class Style(StylePart):
     fill: Union[Fill, None] = None
     text_style: Union[TextStyle, None] = None
-    parent_border: Union[Border, None] = None
     child_border: Union[Border, None] = None
 
     @override
@@ -27,8 +26,6 @@ class Style(StylePart):
                 other.fill),
             text_style=other.text_style if self.text_style is None else self.text_style.join(
                 other.text_style),
-            parent_border=other.parent_border if self.parent_border is None else self.parent_border.join(
-                other.parent_border),
             child_border=other.child_border if self.child_border is None else self.child_border.join(
                 other.child_border)
         )

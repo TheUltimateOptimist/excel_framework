@@ -6,12 +6,16 @@ from .column import Column
 from .row import Row
 from ..non_layout.excel_cell import ExcelCell
 from ...styling.style import Style
-from ...styling.styler import Styler
+from ...styling.styler import Styler, ConditionalStyler
 from ...internals.build_context import BuildContext
 from ...sizes.dimension import ColumnDimension, AutoWidth, FixedWidth
 
 T = TypeVar("T")
 
+@dataclass(frozen=True)
+class ConditionalStyle(Generic[T]):
+    styles: list[Style]
+    selector: Callable[[T], int]
 
 @dataclass(frozen=True)
 class TableColumn(Generic[T]):
@@ -19,7 +23,8 @@ class TableColumn(Generic[T]):
     value: Callable[[T], Any]
     width: Union[AutoWidth, FixedWidth, None] = None
     column_name_style: Union[Style, None] = None
-    value_style: Union[Callable[[T], Union[int, None]], None] = None
+    value_style: Union[Style, None] = None
+    conditional_style: Union[ConditionalStyle[T], None] = None
 
 
 @dataclass(frozen=True)
@@ -28,7 +33,6 @@ class Table(Buildable, Generic[T]):
     data: list[T]
     column_name_style: Union[Style, None] = None
     data_style: Union[Style, None] = None
-    value_styles: Union[list[Style], None] = None
 
     @override
     def internal_build(self, context: BuildContext) -> None:
@@ -37,17 +41,6 @@ class Table(Buildable, Generic[T]):
                 context.collect_column_dimension(
                     ColumnDimension(context.column_index + i, column.width)
                 )
-        if self.value_styles:
-            joined_data_style = self.data_style
-            if context.style:
-                joined_data_style = context.style.join(self.data_style)
-            for i,value_style in enumerate(self.value_styles):
-                assert type(value_style) is Style
-                joined_style = value_style
-                if joined_data_style:
-                    joined_style = joined_data_style.join(value_style)
-                style_id = context.style_manager.add_named_style(context.workbook, joined_style)
-                self.value_styles[i] = style_id # type: ignore
         self.build().internal_build(context)
 
     @override
@@ -58,7 +51,7 @@ class Table(Buildable, Generic[T]):
                 self.column_name_style
             ),
             Styler(
-                Column(children=self.__get_value_rows()),
+                Row(children=self.__get_value_columns()),
                 self.data_style
             )
         ])
@@ -74,17 +67,25 @@ class Table(Buildable, Generic[T]):
             )
         return excel_cells
 
-    def __get_value_rows(self) -> list[Buildable]:
-        rows: list[Buildable] = []
-        for model in self.data:
+    def __get_value_columns(self) -> list[Buildable]:
+        columns: list[Buildable] = []
+        for column in self.columns:
             excel_cells = []
-            for column in self.columns:
+            conditional_style_names: list[str] = []
+            for model in self.data:
+                conditional_style_index: Union[int, None] = None
                 value = column.value(model)
-                style_id: Union[int, None] = None
-                style_index = column.value_style(
-                    model) if column.value_style else None
-                if style_index is not None:
-                    style_id = self.value_styles[style_index] # type: ignore
-                excel_cells.append(ExcelCell(value, style_id))
-            rows.append(Row(children=excel_cells))
-        return rows
+                if column.conditional_style is not None:
+                    conditional_style_index = column.conditional_style.selector(model)
+                excel_cells.append(ExcelCell(value, conditional_style_index))
+            columns.append(
+                Styler(
+                    ConditionalStyler(
+                        Column(children=excel_cells),
+                        column.conditional_style.styles if column.conditional_style is not None else [],
+                        conditional_style_names
+                    ),
+                    column.value_style
+                )
+            )
+        return columns
