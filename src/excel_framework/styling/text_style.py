@@ -58,7 +58,7 @@ class TextStyle(StylePart):
         )
 
     @override
-    def apply_to(self, cell: Cell) -> None:
+    def apply_to(self, cell: Union[Cell, openpyxl.NamedStyle]) -> None:
         alignment = openpyxl.Alignment()
         font = openpyxl.Font()
         font.size = self.font_size

@@ -7,7 +7,6 @@ from openpyxl.cell import Cell
 import openpyxl.styles as openpyxl
 from .style_part import StylePart
 
-
 class BorderStyle(Enum):
     DASH_DOT = "dashDot"
     DASH_DOT_DOT = "dashDotDot"
@@ -78,7 +77,7 @@ class Border(StylePart):
         return result
 
     @override
-    def apply_to(self, cell: Cell) -> None:
+    def apply_to(self, cell: Union[Cell, openpyxl.NamedStyle]) -> None:
         border = openpyxl.Border()
         if self.all is not None:
             border.left = border.right = border.top = border.bottom = self.all.to_openpyxl()
@@ -96,33 +95,48 @@ class Border(StylePart):
             border.bottom = self.bottom.to_openpyxl()
         cell.border = border
 
-    def apply_as_parent_to(self, cell: Cell, parent_border_coordinates: ParentBorderCoordinates) -> None:
+    def apply_as_parent_to(self, cell: Union[openpyxl.NamedStyle, Cell], style_id: int, has_top = False, has_right = False, has_bottom = False, has_left = False) -> None:
+        if type(cell) is Cell:
+            total = int(has_top) + int(has_right) + int(has_bottom) + int(has_left)
+            if total == 0:
+                cell.style = str(style_id)
+                return
+            elif total == 1:
+                if has_top:
+                    cell.style = f"{style_id}-top"
+                elif has_right:
+                    cell.style = f"{style_id}-right"
+                elif has_bottom:
+                    cell.style = f"{style_id}-bottom"
+                elif has_left:
+                    cell.style = f"{style_id}-left"
+                return
         top: Union[openpyxl.Side, None] = cell.border.top
         bottom: Union[openpyxl.Side, None] = cell.border.bottom
         right: Union[openpyxl.Side, None] = cell.border.right
         left: Union[openpyxl.Side, None] = cell.border.left
-        if cell.row == parent_border_coordinates.row_left_top:
+        if has_top:
             if self.all is not None:
                 top = self.all.to_openpyxl()
             if self.horizontal is not None:
                 top = self.horizontal.to_openpyxl()
             if self.top is not None:
                 top = self.top.to_openpyxl()
-        if cell.column == parent_border_coordinates.col_right_bottom:
+        if has_right:
             if self.all is not None:
                 right = self.all.to_openpyxl()
             if self.vertical is not None:
                 right = self.vertical.to_openpyxl()
             if self.right is not None:
                 right = self.right.to_openpyxl()
-        if cell.row == parent_border_coordinates.row_right_bottom:
+        if has_bottom:
             if self.all is not None:
                 bottom = self.all.to_openpyxl()
             if self.horizontal is not None:
                 bottom = self.horizontal.to_openpyxl()
             if self.bottom is not None:
                 bottom = self.bottom.to_openpyxl()
-        if cell.column == parent_border_coordinates.col_left_top:
+        if has_left:
             if self.all is not None:
                 left = self.all.to_openpyxl()
             if self.vertical is not None:

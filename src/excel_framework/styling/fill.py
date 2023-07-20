@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from overrides import override
 from typing import Union
 from openpyxl.cell import Cell
-from openpyxl.styles import PatternFill
+from openpyxl.styles import PatternFill, NamedStyle
 from .color import *
 from .style import StylePart
 
@@ -20,7 +20,7 @@ class Fill(StylePart):
         return self
 
     @override
-    def apply_to(self, cell: Cell) -> None:
+    def apply_to(self, cell: Union[Cell, NamedStyle]) -> None:
         if self.color is not None:
             cell.fill = PatternFill(
                 start_color=self.color.hex, end_color=self.color.hex, fill_type="solid")

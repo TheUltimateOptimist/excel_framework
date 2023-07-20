@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from overrides import override
 from openpyxl.cell import Cell
+from openpyxl.styles import NamedStyle
 
 from .style_part import StylePart
 from .text_style import TextStyle
@@ -32,7 +33,7 @@ class Style(StylePart):
                 other.child_border)
         )
 
-    def apply_to(self, cell: Cell) -> None:
+    def apply_to(self, cell: Union[NamedStyle, Cell]) -> None:
         if self.fill:
             self.fill.apply_to(cell)
         if self.text_style:

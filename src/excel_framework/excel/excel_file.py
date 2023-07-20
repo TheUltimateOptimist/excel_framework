@@ -21,7 +21,7 @@ class ExcelFile:
             if i > 0:
                 context = context.new_sheet(sheet.title, sheet.dimensions)
             if sheet.child and self.global_style:
-                Styler.from_style(
+                Styler(
                     sheet.child, self.global_style).internal_build(context)
             elif sheet.child:
                 sheet.child.internal_build(context)
