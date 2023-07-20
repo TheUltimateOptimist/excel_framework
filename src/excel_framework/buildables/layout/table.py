@@ -15,7 +15,7 @@ T = TypeVar("T")
 @dataclass(frozen=True)
 class ConditionalStyle(Generic[T]):
     styles: list[Style]
-    selector: Callable[[T], int]
+    selector: Callable[[T], Union[int, None]]
 
 @dataclass(frozen=True)
 class TableColumn(Generic[T]):
