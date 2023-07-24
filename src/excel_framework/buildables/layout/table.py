@@ -13,9 +13,16 @@ from ...sizes.dimension import ColumnDimension, AutoWidth, FixedWidth
 T = TypeVar("T")
 
 @dataclass(frozen=True)
-class ConditionalStyle(Generic[T]):
+class ModelConditionalStyle(Generic[T]):
     styles: list[Style]
     selector: Callable[[T], Union[int, None]]
+
+@dataclass(frozen=True)
+class ValueConditionalStyle(Generic[T]):
+    styles: list[Style]
+    selector: Callable[[T], Union[int, None]]
+
+
 
 @dataclass(frozen=True)
 class TableColumn(Generic[T]):
@@ -24,7 +31,7 @@ class TableColumn(Generic[T]):
     width: Union[AutoWidth, FixedWidth, None] = None
     column_name_style: Union[Style, None] = None
     value_style: Union[Style, None] = None
-    conditional_style: Union[ConditionalStyle[T], None] = None
+    conditional_style: Union[ModelConditionalStyle[T], ValueConditionalStyle[Any], None] = None
 
 
 @dataclass(frozen=True)
@@ -75,8 +82,10 @@ class Table(Buildable, Generic[T]):
             for model in self.data:
                 conditional_style_index: Union[int, None] = None
                 value = column.value(model)
-                if column.conditional_style is not None:
+                if column.conditional_style is not None and type(column.conditional_style) is ModelConditionalStyle:
                     conditional_style_index = column.conditional_style.selector(model)
+                elif column.conditional_style is not None and type(column.conditional_style) is ValueConditionalStyle: 
+                    conditional_style_index = column.conditional_style.selector(value)
                 excel_cells.append(ExcelCell(value, conditional_style_index))
             columns.append(
                 Styler(
