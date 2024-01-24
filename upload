@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+from jonascript import *
+import sys
+import os
+
+def get_commit_message() -> str:
+    message = input("commit message: ")
+    if message.strip() != "":
+        return message.strip()
+    else:
+        print("Please provide a non-empty commit message!")
+        return get_commit_message()
+
+def bump_version(degree: int) -> None:
+    global lines
+    with open("pyproject.toml", mode="r") as file:
+        lines = file.readlines()
+    with open("pyproject.toml", mode="w") as file:
+        for i, line in enumerate(lines):
+            if line.startswith("version"):
+                # example:
+                # line = 'version = "1.0.1"'
+                # versions = ['1', '0', '1']
+                versions = line.strip().split(" ")[-1].removeprefix('"').removesuffix('"').split(".")
+                versions[-degree] = str(int(versions[-degree]) + 1)
+                lines[i] = f'version = "{".".join(versions)}"\n'
+        file.writelines(lines)
+
+if os.path.exists("dist") and cmd("rm -rf dist").returncode:
+    raise Exception("Removal of dist directory failed!")
+
+degree = 1
+if "--degree=2" in sys.argv:
+    degree = 2
+if "--degree=3" in sys.argv:
+    degree=3
+bump_version(degree)
+
+token =  "pypi-AgEIcHlwaS5vcmcCJDZhOGRhYWE5LTZhMzktNDg5Mi05OTY1LWFkZmU4OTRhMDE1MQACF1sxLFsiZXhjZWwtZnJhbWV3b3JrIl1dAAIsWzIsWyIzNTE2NjNjMC0wOGVkLTQ3ZTMtYTQzNy0yZDFkYjAyYTA4ZDkiXV0AAAYgd-D79FjSTdb23bVpvIRGzk6HNygmjWWsAr-t-OTmgmg"
+if Command("python3 -m build").aand(f"python3 -m twine upload -u __token__ -p {token} dist/*").execp().returncode:
+    raise Exception("Uploading failed!")
+
+if "--commit" in sys.argv:
+    commit_message = get_commit_message() 
+    if Command("git add .").aand(f"git commit -m '{commit_message}'").aand("git push origin master").execp().returncode:
+        raise Exception("committing failed!")
