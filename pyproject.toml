@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "excel_framework"
-version = "0.4.0"
+version = "0.4.1"
 authors = [
   { name="Jonathan Dück", email="jonathan.dueck@digital-confidence.de" },
 ]
-description = "A small example package"
+description = "A framework for creating excel files declaratively."
 readme = "README.md"
 dependencies = [
     "openpyxl",
